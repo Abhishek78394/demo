@@ -30,5 +30,5 @@ export const IDLE_ROTATION_ORDER = [
   CATEGORIES.ADULT,
 ];
 
-/** How long placeholder / image ads stay on screen */
-export const IMAGE_AD_DURATION_MS = 8000;
+/** How long image ads stay on screen (digital 16:9 display) */
+export const IMAGE_AD_DURATION_MS = 10000;

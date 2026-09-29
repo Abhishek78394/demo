@@ -16,6 +16,7 @@ export default function AdPlayer({
   facePresent = false,
   muted = false,
   orientation = '0',
+  onAdChange,
 }) {
   const targeting = Boolean(facePresent && category);
   const ads = useMemo(() => {
@@ -51,6 +52,11 @@ export default function AdPlayer({
     ? category
     : current?.category || category;
 
+  // Let the screen know which creative is visible (for tap-to-open URL).
+  useEffect(() => {
+    onAdChange?.(current);
+  }, [current, onAdChange]);
+
   useEffect(() => {
     clearTimeout(timerRef.current);
     if (!current || current.type === 'video') {
@@ -76,7 +82,13 @@ export default function AdPlayer({
   if (current.type === 'image') {
     return (
       <View style={styles.fill} pointerEvents="none">
-        <Image source={current.source} style={styles.media} resizeMode="cover" />
+        <Image
+          key={`${modeKey}-${current.id}-${playKey}`}
+          source={current.source}
+          style={styles.media}
+          resizeMode="contain"
+          onError={advance}
+        />
       </View>
     );
   }

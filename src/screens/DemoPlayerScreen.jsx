@@ -7,6 +7,7 @@ import AudienceCamera from '../components/AudienceCamera';
 import AudiencePicker from '../components/AudiencePicker';
 import {CATEGORY_LABELS} from '../constants/categories';
 import useAudienceDetection from '../utils/hooks/useAudienceDetection';
+import {openAdUrl} from '../utils/openAdUrl';
 import {
   getPref,
   setPref,
@@ -75,6 +76,25 @@ export default function DemoPlayerScreen() {
     setControlsVisible(v => !v);
   }, []);
 
+  // Tap the ad → open the advertiser's website (URLs live in src/data/ads.js).
+  const currentAdRef = useRef(null);
+  const lastTapAtRef = useRef(0);
+  const handleAdChange = useCallback(ad => {
+    currentAdRef.current = ad;
+  }, []);
+  const handleAdTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapAtRef.current < 1500) {
+      return;
+    }
+    const url = currentAdRef.current?.destinationUrl;
+    if (!url) {
+      return;
+    }
+    lastTapAtRef.current = now;
+    openAdUrl(url);
+  }, []);
+
   const cycleOrientation = useCallback(() => {
     setOrientation(prev => {
       const next = nextOrientation(prev);
@@ -141,6 +161,7 @@ export default function DemoPlayerScreen() {
           facePresent={facePresent || Boolean(manualCategory)}
           muted={muted}
           orientation={orientation}
+          onAdChange={handleAdChange}
         />
       </View>
 
@@ -157,6 +178,7 @@ export default function DemoPlayerScreen() {
       <GestureDetector gesture={longPressGesture}>
         <Pressable
           style={styles.touchLayer}
+          onPress={handleAdTap}
           onLongPress={toggleControls}
           delayLongPress={500}
           // Let settings panel (higher zIndex) receive taps when open.

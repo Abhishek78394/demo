@@ -35,6 +35,23 @@ Grant camera permission when prompted. Prefer a front or USB camera facing the a
 
 From [shubham0204/Age-Gender_Estimation_TF-Android](https://github.com/shubham0204/Age-Gender_Estimation_TF-Android) (UTKFace-trained). Accuracy is demo-grade, especially on TV/USB cameras.
 
-## Replace placeholder ads
+## Ads (Carrefour + LuLu) and click-through
 
-Edit `src/data/ads.js` and drop media into `src/assets/ads/<category>/`.
+| Detected | Ads shown |
+|----------|-----------|
+| Female / girl | `assets/ads/female/carrefour-women.png`, `lulu-women.png` |
+| Male / boy | `assets/ads/male/carrefour-men.png`, `lulu-men.png` |
+| Child | `assets/ads/child/carrefour-kids.png`, `lulu-kids.png` |
+| No face / uncertain | all six, in rotation |
+
+Each image shows for `IMAGE_AD_DURATION_MS` (`src/constants/categories.js`), then the next creative in that category plays.
+
+**Tap the ad** → opens the advertiser website in the browser. **Press & hold** still opens settings.
+
+### Change URLs / add advertisers
+
+Edit `src/data/ads.js`:
+
+- `ADVERTISER_URLS` — one URL per brand (`carrefour`, `lulu`).
+- Per-creative override: pass `destinationUrl` to `creative({...})`.
+- New advertiser/category: add an image under `src/assets/ads/<category>/`, then a `creative({...})` entry in `ADS_BY_CATEGORY`.
