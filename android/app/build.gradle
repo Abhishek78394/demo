@@ -53,7 +53,7 @@ react {
     /* Autolinking */
     autolinkLibrariesWithApp()
     libraryName = "AppSpec"
-    codegenJavaPackageName = "com.screenistaplustv"
+    codegenJavaPackageName = "com.screenista.demo"
 }
 
 /**
@@ -124,12 +124,12 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.screenistaplustv"
+    namespace "com.screenista.demo"
     buildFeatures {
         buildConfig true
     }
     defaultConfig {
-        applicationId "com.screenistademo"
+        applicationId "com.screenista.demo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // PROD
@@ -201,3 +201,5 @@ dependencies {
     }
 }
 
+
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")

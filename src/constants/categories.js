@@ -30,5 +30,11 @@ export const IDLE_ROTATION_ORDER = [
   CATEGORIES.ADULT,
 ];
 
+/**
+ * After tapping an ad, the advertiser site opens inside the app and closes
+ * automatically once the user has been idle this long (ads resume).
+ */
+export const WEB_INACTIVITY_TIMEOUT_MS = 15000;
+
 /** How long image ads stay on screen (digital 16:9 display) */
 export const IMAGE_AD_DURATION_MS = 10000;

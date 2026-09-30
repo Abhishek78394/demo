@@ -82,9 +82,9 @@ export default function useAudienceDetection({
     }
 
     noFaceHitsRef.current = 0;
-    setFacePresent(true);
 
     if (nextCategory === categoryRef.current) {
+      setFacePresent(true);
       pendingRef.current = null;
       hitsRef.current = 0;
       return;
@@ -100,6 +100,7 @@ export default function useAudienceDetection({
     if (hitsRef.current >= STABLE_HITS_REQUIRED) {
       categoryRef.current = nextCategory;
       setCategory(nextCategory);
+      setFacePresent(true);
       pendingRef.current = null;
       hitsRef.current = 0;
     }
@@ -138,7 +139,7 @@ export default function useAudienceDetection({
         const result = await classifyAudienceImage(path);
         setLastDetection(result);
 
-        if (!result?.faceFound || !result?.category || result.uncertain) {
+        if (!result?.faceFound || !result?.category) {
           noFaceHitsRef.current += 1;
           if (noFaceHitsRef.current >= NO_FACE_HITS_TO_CLEAR) {
             setFacePresent(false);

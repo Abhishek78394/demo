@@ -86,7 +86,7 @@
             android:name=".AdbClipboardReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.screenistaplustv.ADB_SET_TEXT" />
+                <action android:name="com.screenista.demo.ADB_SET_TEXT" />
             </intent-filter>
         </receiver>
 

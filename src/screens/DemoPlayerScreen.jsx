@@ -1,13 +1,13 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import ImmersiveMode from 'react-native-immersive-mode';
 import AdPlayer from '../components/AdPlayer';
 import AudienceCamera from '../components/AudienceCamera';
-import AudiencePicker from '../components/AudiencePicker';
+import SettingsScreen from './SettingsScreen';
 import {CATEGORY_LABELS} from '../constants/categories';
 import useAudienceDetection from '../utils/hooks/useAudienceDetection';
-import {openAdUrl} from '../utils/openAdUrl';
+import AdWebViewOverlay from '../components/AdWebViewOverlay';
 import {
   getPref,
   setPref,
@@ -28,6 +28,7 @@ export default function DemoPlayerScreen() {
   const [controlsVisible, setControlsVisible] = useState(false);
   const [manualCategory, setManualCategory] = useState(null);
   const [cameraInfo, setCameraInfo] = useState(null);
+  const [cameraPreview, setCameraPreview] = useState(false);
   const [orientation, setOrientation] = useState('0');
   const [muted, setMuted] = useState(false);
   const [prefsReady, setPrefsReady] = useState(false);
@@ -75,25 +76,25 @@ export default function DemoPlayerScreen() {
   const toggleControls = useCallback(() => {
     setControlsVisible(v => !v);
   }, []);
+  const closeSettings = useCallback(() => setControlsVisible(false), []);
+  const toggleCameraPreview = useCallback(
+    () => setCameraPreview(v => !v),
+    [],
+  );
 
   // Tap the ad → open the advertiser's website (URLs live in src/data/ads.js).
   const currentAdRef = useRef(null);
-  const lastTapAtRef = useRef(0);
+  const [webUrl, setWebUrl] = useState(null);
   const handleAdChange = useCallback(ad => {
     currentAdRef.current = ad;
   }, []);
   const handleAdTap = useCallback(() => {
-    const now = Date.now();
-    if (now - lastTapAtRef.current < 1500) {
-      return;
-    }
     const url = currentAdRef.current?.destinationUrl;
-    if (!url) {
-      return;
+    if (url) {
+      setWebUrl(url);
     }
-    lastTapAtRef.current = now;
-    openAdUrl(url);
   }, []);
+  const closeWeb = useCallback(() => setWebUrl(null), []);
 
   const cycleOrientation = useCallback(() => {
     setOrientation(prev => {
@@ -167,7 +168,7 @@ export default function DemoPlayerScreen() {
 
       <AudienceCamera
         ref={cameraRef}
-        preview={controlsVisible}
+        preview={controlsVisible && cameraPreview}
         onStatusChange={setCameraInfo}
       />
 
@@ -186,32 +187,24 @@ export default function DemoPlayerScreen() {
         />
       </GestureDetector>
 
-      {controlsVisible ? (
-        <View style={styles.badge} pointerEvents="none">
-          <Text style={styles.badgeLabel}>NOW TARGETING</Text>
-          <Text style={styles.badgeValue}>{displayCategoryLabel}</Text>
-          <Text style={styles.badgeMeta}>{detectionLine}</Text>
-          {prefsReady ? (
-            <Text style={styles.badgeMeta}>
-              Orientation {orientation}° · {muted ? 'Muted' : 'Sound on'}
-            </Text>
-          ) : null}
-          <Text style={styles.badgeMeta}>Press & hold to close</Text>
-        </View>
-      ) : null}
+      {webUrl ? <AdWebViewOverlay url={webUrl} onClose={closeWeb} /> : null}
 
-      <AudiencePicker
-        visible={controlsVisible}
-        activeCategory={category}
-        autoMode={!manualCategory}
-        onAuto={() => setManualCategory(null)}
-        onSelect={setManualCategory}
-        orientation={orientation}
-        onCycleOrientation={cycleOrientation}
-        muted={muted}
-        onToggleMute={toggleMute}
-        onClose={() => setControlsVisible(false)}
-      />
+      {controlsVisible ? (
+        <SettingsScreen
+          activeCategory={category}
+          autoMode={!manualCategory}
+          onAuto={() => setManualCategory(null)}
+          onSelect={setManualCategory}
+          orientation={orientation}
+          onCycleOrientation={cycleOrientation}
+          muted={muted}
+          onToggleMute={toggleMute}
+          cameraPreview={cameraPreview}
+          onToggleCameraPreview={toggleCameraPreview}
+          cameraStatus={`${displayCategoryLabel} · ${detectionLine}`}
+          onClose={closeSettings}
+        />
+      ) : null}
     </View>
   );
 }
